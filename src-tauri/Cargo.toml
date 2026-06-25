@@ -2,7 +2,7 @@
 name = "flux-desktop"
 version = "1.0.0"
 description = "Flux - desktop API client"
-edition = "2026"
+edition = "2021"
 
 # The lib target keeps the app code reusable (and is the layout `tauri` CLI expects).
 [lib]
