@@ -14,10 +14,9 @@ RUN export VITE_API_BASE_URL="$VITE_API_BASE_URL"; \
 
 # --- serve stage ---
 FROM nginx:1.27-alpine
-# Render nginx.conf at startup so ${BACKEND_PORT} (default 7887) is substituted
-# by the image's envsubst; the filter keeps nginx's own $host/$uri/... intact.
-ENV BACKEND_PORT=7887 NGINX_ENVSUBST_FILTER=BACKEND_PORT
+# Static config: nginx proxies /api to the backend service on its fixed
+# internal port (7887), so no env templating is needed here.
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
