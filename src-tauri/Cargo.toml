@@ -1,0 +1,33 @@
+[package]
+name = "flux-desktop"
+version = "1.0.0"
+description = "Flux - desktop API client"
+edition = "2026"
+
+# The lib target keeps the app code reusable (and is the layout `tauri` CLI expects).
+[lib]
+name = "flux_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+# rustls instead of the platform TLS stack: no OpenSSL headaches on Linux,
+# identical behaviour on all three OSes. gzip/brotli/deflate mirror what the
+# web backend's httpx proxy decodes transparently.
+reqwest = { version = "0.12", default-features = false, features = [
+    "rustls-tls",
+    "http2",
+    "gzip",
+    "brotli",
+    "deflate",
+] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

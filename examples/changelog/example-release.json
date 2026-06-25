@@ -1,0 +1,68 @@
+{
+    "version": "2.2.0",
+    "title": "Flows, faster search, and a calmer inbox",
+    "is_published": true,
+    "body": [
+        {
+            "kind": "paragraph",
+            "text": "This release focuses on the everyday loop: building flows, finding requests, and keeping notifications out of your way."
+        },
+        {
+            "kind": "heading",
+            "text": "Highlights"
+        },
+        {
+            "kind": "badge",
+            "badge": "added",
+            "text": "Drag-and-drop reordering in the flow and script block editors."
+        },
+        {
+            "kind": "badge",
+            "badge": "changed",
+            "text": "Sidebar search now matches request names and URLs as you type."
+        },
+        {
+            "kind": "badge",
+            "badge": "fixed",
+            "text": "Notifications no longer re-appear after being marked as read."
+        },
+        {
+            "kind": "badge",
+            "badge": "removed",
+            "text": "Dropped the legacy v1 API surface."
+        },
+        {
+            "kind": "heading",
+            "text": "Working with flows"
+        },
+        {
+            "kind": "steps",
+            "items": [
+                "Open a flow and add a Call step.",
+                "Capture a value from its response into a flow variable.",
+                "Drag steps to reorder them, then press Run."
+            ]
+        },
+        {
+            "kind": "note",
+            "text": "Flow runs are client-side and reuse the same send pipeline as a normal request, so behaviour matches exactly."
+        },
+        {
+            "kind": "list",
+            "items": [
+                "Faster cold start on large workspaces.",
+                "Clearer error messages for unresolved variables.",
+                "Keyboard focus is restored after closing a dialog."
+            ]
+        },
+        {
+            "kind": "code",
+            "text": "GET /api/v2/changelog/latest"
+        },
+        {
+            "kind": "linkButton",
+            "href": "https://flux.sh/docs",
+            "label": "Read the docs"
+        }
+    ]
+}

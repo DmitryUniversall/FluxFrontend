@@ -1,0 +1,13 @@
+node_modules
+.idea
+
+# Rust / Tauri
+/src-tauri/target/
+
+# Node
+/node_modules/
+/dist/
+
+# Builds
+*.exe
+*.msi

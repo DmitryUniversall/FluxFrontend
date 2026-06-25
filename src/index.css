@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    /* Dark, near-black workspace with a single restrained violet accent. */
+    --bg: 13 15 20; /* #0d0f14 */
+    --surface: 18 21 27; /* #12151b */
+    --elevated: 24 28 36; /* #181c24 */
+    --border: 33 39 49; /* #212731 */
+    --muted: 138 147 161; /* #8a93a1 */
+    --subtle: 96 104 117; /* #606875 */
+    --fg: 228 231 236; /* #e4e7ec */
+    --accent: 129 124 255; /* #817cff */
+    --accent-soft: 47 44 86; /* translucent accent base */
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: rgb(var(--bg));
+    color: rgb(var(--fg));
+    font-family: "Sora", ui-sans-serif, system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* Slim, unobtrusive scrollbars to match the minimal aesthetic */
+::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgb(var(--border));
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--subtle));
+}
+
+input,
+textarea,
+select,
+button {
+    font-family: inherit;
+}
+
+textarea,
+input {
+    caret-color: rgb(var(--accent));
+}
+
+::selection {
+    background: rgb(var(--accent) / 0.3);
+}
+
+.mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* focus ring helper */
+.ring-accent:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px rgb(var(--bg)),
+        0 0 0 3px rgb(var(--accent) / 0.6);
+}
