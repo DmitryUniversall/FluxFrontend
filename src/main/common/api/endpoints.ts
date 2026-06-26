@@ -32,6 +32,9 @@ export const endpoints = {
     identity: (id: string) => `/api/v2/identities/${id}`,
     identityDefault: (id: string) => `/api/v2/identities/${id}/default`,
     proxy: "/api/v2/proxy",
+    // Public, IP-rate-limited relay for the landing-page demos (no auth; locked
+    // to the /api/v2/guide/* sandbox on the backend).
+    proxyPreview: "/api/v2/proxy/preview",
     notifications: "/api/v2/notifications",
     notificationRead: (id: string) => `/api/v2/notifications/${id}/read`,
     notificationsReadAll: "/api/v2/notifications/read-all",

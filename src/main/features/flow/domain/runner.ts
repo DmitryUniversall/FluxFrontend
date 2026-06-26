@@ -12,6 +12,7 @@ import type { Json } from "@/core/types";
 import type { Environment } from "@/main/features/environments/domain/models";
 import { isAllowedSelectedValue, variantOptions } from "@/main/features/environments/domain/use-cases";
 import { requestsRepository } from "@/main/features/request-editor/data/requests-repository";
+import type { RequestsRepository } from "@/main/features/request-editor/data/requests-repository";
 import type {
     AssertStep,
     Auth,
@@ -69,6 +70,7 @@ interface Exec {
     isCancelled: () => boolean;
     requestInput: InputProvider | null;
     resolveAuth: (a: Auth) => Auth;
+    repo: RequestsRepository;
     emit: () => void;
 }
 
@@ -124,6 +126,9 @@ export async function runFlow(
     applyMutations: (mutations: EnvMutation[]) => Promise<void> = async () => {},
     requestInput: InputProvider | null = null,
     resolveAuth: (a: Auth) => Auth = (a) => a,
+    // The data layer for Call/Poll steps. Defaults to the app's authenticated
+    // repository; the landing demos inject a public, preview-proxy-backed one.
+    repo: RequestsRepository = requestsRepository,
 ): Promise<void> {
     const envSnap = new Map<string, string>();
     if (env) for (const v of env.variables) if (v.enabled && v.key) envSnap.set(v.key, v.value);
@@ -141,6 +146,7 @@ export async function runFlow(
         isCancelled,
         requestInput,
         resolveAuth,
+        repo,
         emit: () => {},
     };
     ex.emit = () => onUpdate({ results: ex.results.map((r) => ({ ...r })), vars: Object.fromEntries(scope) });
@@ -216,7 +222,7 @@ async function runSteps(steps: FlowStep[], depth: number, ex: Exec): Promise<voi
                 result.status = "passed";
                 result.detail = `auth = ${step.auth.type}`;
             } else if (step.type === "call") {
-                const r = await runCall(step, ex.envSnap, ex.scope, ex.auth, ex.resolveAuth);
+                const r = await runCall(step, ex.envSnap, ex.scope, ex.auth, ex.resolveAuth, ex.repo);
                 ex.last = r.response;
                 result.title = `Call ${r.name}`;
                 result.request = r.outgoing;
@@ -237,6 +243,7 @@ async function runSteps(steps: FlowStep[], depth: number, ex: Exec): Promise<voi
                     ex.env,
                     ex.isCancelled,
                     ex.resolveAuth,
+                    ex.repo,
                     (a) => {
                         result.detail = `attempt ${a}…`;
                         ex.emit();
@@ -319,11 +326,12 @@ async function runCall(
     scope: Map<string, string>,
     auth: Auth | null,
     resolveAuth: (a: Auth) => Auth,
+    repo: RequestsRepository,
 ) {
     if (!step.requestId) throw new Error("No target request selected for this Call step");
     let target;
     try {
-        target = await requestsRepository.get(step.requestId);
+        target = await repo.get(step.requestId);
     } catch {
         throw new Error("Target request not found (it may have been deleted)");
     }
@@ -345,7 +353,7 @@ async function runCall(
     const outgoing = buildOutgoing({ ...target, auth: resolveAuth(chosenAuth) }, resolver);
     let response: ResponseView;
     try {
-        response = buildResponseView(await requestsRepository.send(outgoing));
+        response = buildResponseView(await repo.send(outgoing));
     } catch (e) {
         throw new StepFailure(e instanceof Error ? e.message : "Request failed", outgoing);
     }
@@ -433,12 +441,13 @@ async function runPoll(
     env: Environment | null,
     isCancelled: () => boolean,
     resolveAuth: (a: Auth) => Auth,
+    repo: RequestsRepository,
     onAttempt: (n: number) => void,
 ) {
     if (!step.requestId) throw new Error("No target request selected for this Poll step");
     let target;
     try {
-        target = await requestsRepository.get(step.requestId);
+        target = await repo.get(step.requestId);
     } catch {
         throw new Error("Target request not found (it may have been deleted)");
     }
@@ -473,7 +482,7 @@ async function runPoll(
                 argMap.has(n) ? argMap.get(n) : scope.has(n) ? scope.get(n) : envSnap.get(n),
             );
         outgoing = buildOutgoing({ ...target, auth: resolveAuth(chosenAuth) }, resolver);
-        response = buildResponseView(await requestsRepository.send(outgoing));
+        response = buildResponseView(await repo.send(outgoing));
 
         met = evalAssert(
             { id: step.id, kind: step.kind, expr: step.expr, mode: step.mode, op: step.op, value: step.value },

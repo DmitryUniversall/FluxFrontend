@@ -4,6 +4,7 @@ import { isTauri } from "@/main/common/platform";
 import { Spinner } from "@/main/common/ui/feedback";
 import { AuthPage } from "@/main/features/auth/ui/AuthPage";
 import { useAuth } from "@/main/features/auth/ui/useAuth";
+import { LandingPage } from "@/main/features/landing/ui/LandingPage";
 import { AppShell } from "@/main/features/shell/ui/AppShell";
 
 // The desktop webview serves the bundled assets over a custom protocol with no
@@ -34,7 +35,12 @@ export default function App() {
             <Routes>
                 <Route path="/login" element={authed ? <Navigate to="/" replace /> : <AuthPage mode="login" />} />
                 <Route path="/register" element={authed ? <Navigate to="/" replace /> : <AuthPage mode="register" />} />
-                <Route path="/" element={authed ? <AppShell /> : <Navigate to="/login" replace />} />
+                {/* Logged-out web visitors land on the public landing page; the desktop
+                    build has no landing and goes straight to sign-in. */}
+                <Route
+                    path="/"
+                    element={authed ? <AppShell /> : isTauri() ? <Navigate to="/login" replace /> : <LandingPage />}
+                />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
